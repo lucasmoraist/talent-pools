@@ -51,10 +51,11 @@ public class CandidatoServiceImpl implements CandidatoService {
     }
 
     @Override
-    public void delete(String id) {
+    public void approved(String id) {
         log.info("[CandidatoServiceImpl] - Deletando candidato com ID: {}", id);
         Candidato candidato = this.findById(id);
-        this.repository.delete(candidato);
-        log.info("[CandidatoServiceImpl] - Candidato com ID: {} deletado com sucesso", id);
+        candidato.approved();
+        this.repository.save(candidato);
+        log.info("[CandidatoServiceImpl] - Candidato aprovado com sucesso");
     }
 }

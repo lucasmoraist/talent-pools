@@ -56,4 +56,8 @@ public class Candidato {
         this.resumo = request.getResumo();
         this.isAccepted = false;
     }
+
+    public void approved() {
+        this.isAccepted = true;
+    }
 }

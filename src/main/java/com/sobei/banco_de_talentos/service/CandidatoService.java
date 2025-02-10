@@ -7,5 +7,5 @@ public interface CandidatoService {
     Candidato save(Candidato candidato);
     Page<Candidato> findAll(int page, int size, boolean isAccepted);
     Candidato findById(String id);
-    void delete(String id);
+    void approved(String id);
 }
