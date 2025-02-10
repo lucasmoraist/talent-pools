@@ -26,9 +26,7 @@ public class CandidatoController {
     @Autowired
     private CandidatoService service;
 
-    @Operation(summary = "Salvar candidato", description = "Salva um candidato", security = {
-            @SecurityRequirement(name = "bearer")
-    })
+    @Operation(summary = "Salvar candidato", description = "Salva um candidato")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Candidato salvo com sucesso"),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(
@@ -36,7 +34,7 @@ public class CandidatoController {
                     schema = @Schema(implementation = Exception.class)
             ))
     })
-    @PostMapping
+    @PostMapping("/save")
     public Candidato save(@RequestBody @Valid Candidato candidato) {
         log.info("[CandidatoController] - Recebendo solicitação para salvar candidato: {}", candidato);
         Candidato savedCandidato = this.service.save(candidato);
@@ -84,19 +82,19 @@ public class CandidatoController {
         return candidato;
     }
 
-    @Operation(summary = "Deletar candidato", description = "Deleta um candidato", security = {
+    @Operation(summary = "Aprova candidato", description = "Aprova candidato em uma vaga", security = {
             @SecurityRequirement(name = "bearer")
     })
     @Parameter(name = "id", description = "ID do candidato")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Candidato deletado com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Candidato aprovado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Candidato não encontrado")
     })
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         log.info("[CandidatoController] - Recebendo solicitação para deletar candidato com ID: {}", id);
-        this.service.delete(id);
-        log.info("[CandidatoController] - Candidato com ID {} deletado com sucesso", id);
+        this.service.approved(id);
+        log.info("[CandidatoController] - Candidato com ID {} aprovado com sucesso", id);
     }
 
 }
