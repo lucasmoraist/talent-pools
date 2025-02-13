@@ -1,5 +1,9 @@
 package com.sobei.banco_de_talentos.domain.model;
 
+import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
+import com.sobei.banco_de_talentos.domain.enums.EstadoCivilEnum;
+import com.sobei.banco_de_talentos.domain.enums.SexoEnum;
+import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -23,41 +28,51 @@ public class Candidato {
     private String id;
     @NotBlank(message = "O campo nome é obrigatório")
     private String nome;
-    @NotBlank(message = "O campo data de nascimento é obrigatório")
-    private String dataNascimento;
-    @NotNull(message = "O campo idade é obrigatório")
-    @Min(value = 18, message = "A idade mínima é 18 anos")
+    @NotNull(message = "O campo data de nascimento é obrigatório")
+    private LocalDate dataNascimento;
     private int idade;
-    @NotBlank(message = "O campo sexo é obrigatório")
-    private String sexo;
-    @NotBlank(message = "O campo estado civil é obrigatório")
-    private String estadoCivil;
+    @NotNull(message = "O campo sexo é obrigatório")
+    private SexoEnum sexo;
+    @NotNull(message = "O campo estado civil é obrigatório")
+    private EstadoCivilEnum estadoCivil;
     private Contato contato;
     private Endereco endereco;
     private Documentos documentos;
     private Filhos filhos;
-    private Escolaridade escolaridade;
+    private List<Escolaridade> escolaridades;
     private List<ExperienciaProfissional> experienciaProfissional;
     private String resumo;
-    private Boolean isAccepted;
+    private CargoEnum cargo;
+    private StatusEnum status;
+    private LocalDate dataCadastro;
 
-    public Candidato(Candidato request) {
+    public Candidato(Candidato request, CargoEnum cargo) {
         this.nome = request.getNome();
         this.dataNascimento = request.getDataNascimento();
-        this.idade = request.getIdade();
+        this.idade = LocalDate.now().getYear() - request.getDataNascimento().getYear();
         this.sexo = request.getSexo();
         this.estadoCivil = request.getEstadoCivil();
         this.contato = request.getContato();
         this.endereco = request.getEndereco();
         this.documentos = request.getDocumentos();
         this.filhos = request.getFilhos();
-        this.escolaridade = request.getEscolaridade();
+        this.escolaridades = request.getEscolaridades();
         this.experienciaProfissional = request.getExperienciaProfissional();
         this.resumo = request.getResumo();
-        this.isAccepted = false;
+        this.cargo = cargo;
+        this.status = StatusEnum.PENDENTE;
+        this.dataCadastro = LocalDate.now();
     }
 
-    public void approved() {
-        this.isAccepted = true;
+    public void setStatusPendente() {
+        this.status = StatusEnum.PENDENTE;
+    }
+
+    public void setStatusEmAnalise() {
+        this.status = StatusEnum.EM_ANALISE;
+    }
+
+    public void setStatusAprovado() {
+        this.status = StatusEnum.APROVADO;
     }
 }

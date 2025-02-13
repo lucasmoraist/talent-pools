@@ -13,6 +13,5 @@ public class Escolaridade {
     private String grau;
     private String formacao;
     private int anoConclusao;
-    private String universidade;
-    private List<CursoComplementar> cursosComplementares;
+    private String instituicao;
 }

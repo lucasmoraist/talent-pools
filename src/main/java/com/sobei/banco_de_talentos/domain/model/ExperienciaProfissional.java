@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,7 +13,7 @@ public class ExperienciaProfissional {
     private String empresa;
     private String cargo;
     private String atividades;
-    private String admissao;
-    private String demissao;
+    private LocalDate admissao;
+    private LocalDate demissao;
     private String motivoSaida;
 }

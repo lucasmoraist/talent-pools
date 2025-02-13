@@ -1,0 +1,17 @@
+package com.sobei.banco_de_talentos.domain.enums;
+
+import lombok.Getter;
+
+@Getter
+public enum SexoEnum {
+    MASCULINO("Masculino"),
+    FEMININO("Feminino"),
+    OUTRO("Outro");
+
+    private final String descricao;
+
+    SexoEnum(String descricao) {
+        this.descricao = descricao;
+    }
+
+}

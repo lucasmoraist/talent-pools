@@ -1,5 +1,6 @@
 package com.sobei.banco_de_talentos.domain.model;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +16,6 @@ public class Contato {
     private String celular;
     private String telefone;
     @NotBlank(message = "O campo email é obrigatório")
+    @Email(message = "O campo email deve ser um email válido")
     private String email;
 }
