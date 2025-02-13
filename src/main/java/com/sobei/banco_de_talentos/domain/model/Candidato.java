@@ -4,7 +4,6 @@ import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
 import com.sobei.banco_de_talentos.domain.enums.EstadoCivilEnum;
 import com.sobei.banco_de_talentos.domain.enums.SexoEnum;
 import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
