@@ -1,5 +1,7 @@
 package com.sobei.banco_de_talentos.service.impl;
 
+import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
+import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
 import com.sobei.banco_de_talentos.domain.exceptions.ResourceNotFound;
 import com.sobei.banco_de_talentos.domain.model.Candidato;
 import com.sobei.banco_de_talentos.repository.CandidatoRepository;
@@ -19,21 +21,31 @@ public class CandidatoServiceImpl implements CandidatoService {
     private CandidatoRepository repository;
 
     @Override
-    public Candidato save(Candidato request) {
+    public Candidato save(Candidato request, CargoEnum cargo) {
         log.info("[CandidatoServiceImpl] - Salvando candidato: {}", request);
-        Candidato savedCandidato = this.repository.save(request);
+        Candidato savedCandidato = new Candidato(request, cargo);
+        this.repository.save(savedCandidato);
         log.info("[CandidatoServiceImpl] - Candidato salvo com sucesso: {}", savedCandidato);
         return savedCandidato;
     }
 
     @Override
-    public Page<Candidato> findAll(int page, int size, boolean isAccepted) {
-        log.info("[CandidatoServiceImpl] - Buscando todos os candidatos - Página: {}, Tamanho: {}, Aceito: {}", page, size, isAccepted);
+    public Page<Candidato> findAll(int page, int size, StatusEnum statusEnum, String regiao) {
+        log.info("[CandidatoServiceImpl] - Buscando candidatos - Página: {}, Tamanho: {}, Status: {}, Região: {}", page, size, statusEnum, regiao);
         Pageable pageable = Pageable.ofSize(size).withPage(page);
 
         List<Candidato> candidatos = this.repository.findAll()
                 .stream()
-                .filter(c -> c.getIsAccepted().equals(isAccepted))
+                .filter(c -> {
+                    if (statusEnum != null && regiao != null) {
+                        return c.getStatus().equals(statusEnum) && c.getEndereco().getRegiao().equalsIgnoreCase(regiao);
+                    } else if (statusEnum != null) {
+                        return c.getStatus().equals(statusEnum);
+                    } else if (regiao != null) {
+                        return c.getEndereco().getRegiao().equalsIgnoreCase(regiao);
+                    }
+                    return true;
+                })
                 .toList();
 
         log.info("[CandidatoServiceImpl] - Foram encontrados {} candidatos", candidatos.size());
@@ -51,11 +63,17 @@ public class CandidatoServiceImpl implements CandidatoService {
     }
 
     @Override
-    public void approved(String id) {
-        log.info("[CandidatoServiceImpl] - Deletando candidato com ID: {}", id);
+    public void updateStatus(String id, StatusEnum status) {
+        log.info("[CandidatoServiceImpl] - Atualizando status do candidato com ID: {}", id);
         Candidato candidato = this.findById(id);
-        candidato.approved();
+
+        switch (status) {
+            case PENDENTE -> candidato.setStatusPendente();
+            case APROVADO -> candidato.setStatusAprovado();
+            case EM_ANALISE -> candidato.setStatusEmAnalise();
+        }
+
         this.repository.save(candidato);
-        log.info("[CandidatoServiceImpl] - Candidato aprovado com sucesso");
+        log.info("[CandidatoServiceImpl] - Status do candidato atualizado com sucesso");
     }
 }

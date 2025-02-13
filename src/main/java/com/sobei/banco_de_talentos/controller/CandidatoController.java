@@ -1,5 +1,7 @@
 package com.sobei.banco_de_talentos.controller;
 
+import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
+import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
 import com.sobei.banco_de_talentos.domain.model.Candidato;
 import com.sobei.banco_de_talentos.service.CandidatoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,54 +28,26 @@ public class CandidatoController {
     @Autowired
     private CandidatoService service;
 
-    @Operation(summary = "Salvar candidato", description = "Salva um candidato")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Candidato salvo com sucesso"),
-            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = Exception.class)
-            ))
-    })
     @PostMapping("/save")
-    public Candidato save(@RequestBody @Valid Candidato candidato) {
+    public Candidato save(@RequestParam CargoEnum cargo, @RequestBody @Valid Candidato candidato) {
         log.info("[CandidatoController] - Recebendo solicitação para salvar candidato: {}", candidato);
-        Candidato savedCandidato = this.service.save(candidato);
+        Candidato savedCandidato = this.service.save(candidato, cargo);
         log.info("[CandidatoController] - Candidato salvo com sucesso: {}", savedCandidato);
         return savedCandidato;
     }
 
-    @Operation(summary = "Atualizar candidato", description = "Atualiza um candidato", security = {
-            @SecurityRequirement(name = "bearer")
-    })
-    @Parameters(value = {
-            @Parameter(name = "page", description = "Número da página"),
-            @Parameter(name = "size", description = "Tamanho da página"),
-            @Parameter(name = "isAccepted", description = "Se o candidato já foi aceito")
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Candidato atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Erro ao atualizar candidato")
-    })
     @GetMapping
     public Page<Candidato> findAll(
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "size", defaultValue = "10", required = false) int size,
-            @RequestParam(value = "isAccepted", defaultValue = "false", required = false) boolean isAccepted
-    ) {
-        log.info("[CandidatoController] - Recebendo solicitação para buscar candidatos - Página: {}, Tamanho: {}, Aceito: {}", page, size, isAccepted);
-        Page<Candidato> candidatos = this.service.findAll(page, size, isAccepted);
+            @RequestParam(value = "status", required = false) StatusEnum status,
+            @RequestParam(value = "regiao", required = false) String regiao
+            ) {
+        Page<Candidato> candidatos = this.service.findAll(page, size, status, regiao);
         log.info("[CandidatoController] - Retornando {} candidatos", candidatos.getTotalElements());
         return candidatos;
     }
 
-    @Operation(summary = "Buscar candidato por ID", description = "Busca um candidato por ID", security = {
-            @SecurityRequirement(name = "bearer")
-    })
-    @Parameter(name = "id", description = "ID do candidato")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Candidato encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Candidato não encontrado")
-    })
     @GetMapping("/{id}")
     public Candidato findById(@PathVariable String id) {
         log.info("[CandidatoController] - Recebendo solicitação para buscar candidato com ID: {}", id);
@@ -82,19 +56,14 @@ public class CandidatoController {
         return candidato;
     }
 
-    @Operation(summary = "Aprova candidato", description = "Aprova candidato em uma vaga", security = {
-            @SecurityRequirement(name = "bearer")
-    })
-    @Parameter(name = "id", description = "ID do candidato")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Candidato aprovado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Candidato não encontrado")
-    })
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        log.info("[CandidatoController] - Recebendo solicitação para deletar candidato com ID: {}", id);
-        this.service.approved(id);
-        log.info("[CandidatoController] - Candidato com ID {} aprovado com sucesso", id);
+    @PatchMapping("/{id}")
+    public void updateStatus(
+            @PathVariable String id,
+            @RequestParam("status") StatusEnum status
+    ) {
+        log.info("[CandidatoController] - Recebendo solicitação para atualizar status do candidato com ID: {}", id);
+        this.service.updateStatus(id, status);
+        log.info("[CandidatoController] - Status do candidato atualizado");
     }
 
 }
