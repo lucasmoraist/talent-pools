@@ -23,11 +23,6 @@ public class UserController {
     @Autowired
     private UsuarioService service;
 
-    @Operation(summary = "Salvar usuário", description = "Salva um usuário")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário salvo com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Erro ao salvar usuário")
-    })
     @PostMapping("/save")
     public Usuario save(@RequestBody Usuario usuario) {
         log.info("Recebendo solicitação para salvar usuário: {}", usuario.getEmail());
@@ -36,11 +31,6 @@ public class UserController {
         return savedUsuario;
     }
 
-    @Operation(summary = "Login", description = "Realiza login")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuário logado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Erro ao logar usuário")
-    })
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest request) {
         log.info("Recebendo solicitação de login para o email: {}", request.email());
