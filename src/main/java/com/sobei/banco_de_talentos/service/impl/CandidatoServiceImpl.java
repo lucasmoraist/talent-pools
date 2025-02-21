@@ -1,5 +1,6 @@
 package com.sobei.banco_de_talentos.service.impl;
 
+import com.sobei.banco_de_talentos.domain.dto.EnderecoDTO;
 import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
 import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
 import com.sobei.banco_de_talentos.domain.exceptions.ResourceNotFound;
@@ -67,5 +68,14 @@ public class CandidatoServiceImpl implements CandidatoService {
 
         this.repository.save(candidato);
         log.info("[CandidatoServiceImpl] - Status do candidato atualizado com sucesso");
+    }
+
+    @Override
+    public List<EnderecoDTO> findAddress() {
+        log.info("[CandidatoServiceImpl] - Buscando endereços dos candidatos");
+        return this.repository.findAll()
+                .stream()
+                .map(EnderecoDTO::new)
+                .collect(Collectors.toList());
     }
 }

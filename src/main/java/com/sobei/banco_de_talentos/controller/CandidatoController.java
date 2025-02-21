@@ -1,5 +1,6 @@
 package com.sobei.banco_de_talentos.controller;
 
+import com.sobei.banco_de_talentos.domain.dto.EnderecoDTO;
 import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
 import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
 import com.sobei.banco_de_talentos.domain.model.Candidato;
@@ -10,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -57,6 +60,14 @@ public class CandidatoController {
         log.info("[CandidatoController] - Recebendo solicitação para atualizar status do candidato com ID: {}", id);
         this.service.updateStatus(id, status);
         log.info("[CandidatoController] - Status do candidato atualizado");
+    }
+
+    @GetMapping("/regions")
+    public List<EnderecoDTO> findRegios() {
+        log.info("[CandidatoController] - Buscando regiões");
+        List<EnderecoDTO> regioes = this.service.findAddress();
+        log.info("[CandidatoController] - Regiões encontradas: {}", regioes.size());
+        return regioes;
     }
 
 }
