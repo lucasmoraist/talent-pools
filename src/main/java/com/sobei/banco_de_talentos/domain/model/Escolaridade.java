@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class Escolaridade {
     private String grau;
     private String formacao;
-    private int anoConclusao;
+    private String anoConclusao;
     private String instituicao;
 }
