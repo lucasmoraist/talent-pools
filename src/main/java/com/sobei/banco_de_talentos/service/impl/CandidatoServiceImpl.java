@@ -12,6 +12,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,25 +31,16 @@ public class CandidatoServiceImpl implements CandidatoService {
     }
 
     @Override
-    public Page<Candidato> findAll(int page, int size, StatusEnum statusEnum, String regiao) {
-        log.info("[CandidatoServiceImpl] - Buscando candidatos - Página: {}, Tamanho: {}, Status: {}, Região: {}", page, size, statusEnum, regiao);
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
-
+    public Page<Candidato> findAll(int page, int size, StatusEnum statusEnum, String regiao, CargoEnum cargo) {
+        log.info("[CandidatoServiceImpl] - Buscando candidatos com filtros: cargo={}, regiao={}, status={}", cargo, regiao, statusEnum);
+        Pageable pageable = PageRequest.of(page, size);
         List<Candidato> candidatos = this.repository.findAll()
                 .stream()
-                .filter(c -> {
-                    if (statusEnum != null && regiao != null) {
-                        return c.getStatus().equals(statusEnum) && c.getEndereco().getRegiao().equalsIgnoreCase(regiao);
-                    } else if (statusEnum != null) {
-                        return c.getStatus().equals(statusEnum);
-                    } else if (regiao != null) {
-                        return c.getEndereco().getRegiao().equalsIgnoreCase(regiao);
-                    }
-                    return true;
-                })
-                .toList();
+                .filter(c -> (cargo == null || c.getCargo().equals(cargo)))
+                .filter(c -> (regiao == null || c.getEndereco().getRegiao().equalsIgnoreCase(regiao)))
+                .filter(c -> (statusEnum == null || c.getStatus().equals(statusEnum)))
+                .collect(Collectors.toList());
 
-        log.info("[CandidatoServiceImpl] - Foram encontrados {} candidatos", candidatos.size());
         return new PageImpl<>(candidatos, pageable, candidatos.size());
     }
 

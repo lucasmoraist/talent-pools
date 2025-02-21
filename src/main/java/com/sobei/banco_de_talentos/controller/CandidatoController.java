@@ -30,12 +30,13 @@ public class CandidatoController {
 
     @GetMapping
     public Page<Candidato> findAll(
+            @RequestParam(value = "cargo", required = true) CargoEnum cargo,
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "size", defaultValue = "10", required = false) int size,
             @RequestParam(value = "status", required = false) StatusEnum status,
             @RequestParam(value = "regiao", required = false) String regiao
             ) {
-        Page<Candidato> candidatos = this.service.findAll(page, size, status, regiao);
+        Page<Candidato> candidatos = this.service.findAll(page, size, status, regiao, cargo);
         log.info("[CandidatoController] - Retornando {} candidatos", candidatos.getTotalElements());
         return candidatos;
     }

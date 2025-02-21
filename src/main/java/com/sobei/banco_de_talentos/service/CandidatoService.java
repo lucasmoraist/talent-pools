@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 
 public interface CandidatoService {
     Candidato save(Candidato candidato, CargoEnum cargo);
-    Page<Candidato> findAll(int page, int size, StatusEnum status, String regiao);
+    Page<Candidato> findAll(int page, int size, StatusEnum status, String regiao, CargoEnum cargo);
     Candidato findById(String id);
     void updateStatus(String id, StatusEnum status);
 }
