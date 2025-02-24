@@ -9,6 +9,8 @@ import com.sobei.banco_de_talentos.repository.CandidatoRepository;
 import com.sobei.banco_de_talentos.service.CandidatoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ public class CandidatoServiceImpl implements CandidatoService {
     @Autowired
     private CandidatoRepository repository;
 
+    @CacheEvict(value = "candidatos", allEntries = true)
     @Override
     public Candidato save(Candidato request, CargoEnum cargo) {
         log.info("[CandidatoServiceImpl] - Salvando candidato: {}", request);
@@ -31,6 +34,7 @@ public class CandidatoServiceImpl implements CandidatoService {
         return savedCandidato;
     }
 
+    @Cacheable(value = "candidatos")
     @Override
     public Page<Candidato> findAll(int page, int size, StatusEnum statusEnum, String regiao, CargoEnum cargo) {
         log.info("[CandidatoServiceImpl] - Buscando candidatos com filtros: cargo={}, regiao={}, status={}", cargo, regiao, statusEnum);
@@ -55,6 +59,7 @@ public class CandidatoServiceImpl implements CandidatoService {
                 });
     }
 
+    @CacheEvict(value = "candidatos", allEntries = true)
     @Override
     public void updateStatus(String id, StatusEnum status) {
         log.info("[CandidatoServiceImpl] - Atualizando status do candidato com ID: {}", id);
@@ -70,11 +75,13 @@ public class CandidatoServiceImpl implements CandidatoService {
         log.info("[CandidatoServiceImpl] - Status do candidato atualizado com sucesso");
     }
 
+    @Cacheable(value = "candidatos")
     @Override
-    public List<EnderecoDTO> findAddress() {
+    public List<EnderecoDTO> findAddress(CargoEnum cargo) {
         log.info("[CandidatoServiceImpl] - Buscando endereços dos candidatos");
         return this.repository.findAll()
                 .stream()
+                .filter(c -> c.getCargo().equals(cargo))
                 .map(EnderecoDTO::new)
                 .collect(Collectors.toList());
     }

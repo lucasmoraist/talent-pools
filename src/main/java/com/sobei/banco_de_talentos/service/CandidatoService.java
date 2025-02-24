@@ -13,5 +13,5 @@ public interface CandidatoService {
     Page<Candidato> findAll(int page, int size, StatusEnum status, String regiao, CargoEnum cargo);
     Candidato findById(String id);
     void updateStatus(String id, StatusEnum status);
-    List<EnderecoDTO> findAddress();
+    List<EnderecoDTO> findAddress(CargoEnum cargo);
 }
