@@ -12,4 +12,5 @@ public class Escolaridade {
     private String formacao;
     private String anoConclusao;
     private String instituicao;
+    private String semestre;
 }

@@ -1,5 +1,6 @@
 package com.sobei.banco_de_talentos.service;
 
+import com.sobei.banco_de_talentos.domain.dto.CandidateRequest;
 import com.sobei.banco_de_talentos.domain.dto.EnderecoDTO;
 import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
 import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
@@ -14,4 +15,5 @@ public interface CandidatoService {
     Candidato findById(String id);
     void updateStatus(String id, StatusEnum status);
     List<EnderecoDTO> findAddress(CargoEnum cargo);
+    void saveAll(List<CandidateRequest> request);
 }

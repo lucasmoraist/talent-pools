@@ -1,5 +1,6 @@
 package com.sobei.banco_de_talentos.controller;
 
+import com.sobei.banco_de_talentos.domain.dto.CandidateRequest;
 import com.sobei.banco_de_talentos.domain.dto.EnderecoDTO;
 import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
 import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
@@ -68,6 +69,13 @@ public class CandidatoController {
         List<EnderecoDTO> regioes = this.service.findAddress(cargo);
         log.info("[CandidatoController] - Regiões encontradas: {}", regioes.size());
         return regioes;
+    }
+
+    @PostMapping("save-all")
+    public void saveAll(@RequestBody List<CandidateRequest> candidatos) {
+        log.info("[CandidatoController] - Recebendo solicitação para salvar candidatos: {}", candidatos);
+        this.service.saveAll(candidatos);
+        log.info("[CandidatoController] - Candidatos salvos com sucesso");
     }
 
 }

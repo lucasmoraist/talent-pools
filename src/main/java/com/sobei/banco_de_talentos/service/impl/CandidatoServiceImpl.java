@@ -1,5 +1,6 @@
 package com.sobei.banco_de_talentos.service.impl;
 
+import com.sobei.banco_de_talentos.domain.dto.CandidateRequest;
 import com.sobei.banco_de_talentos.domain.dto.EnderecoDTO;
 import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
 import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
@@ -84,5 +85,14 @@ public class CandidatoServiceImpl implements CandidatoService {
                 .filter(c -> c.getCargo().equals(cargo))
                 .map(EnderecoDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void saveAll(List<CandidateRequest> request) {
+        Candidato c = null;
+        for (CandidateRequest candidato : request) {
+            c = new Candidato(candidato);
+        }
+        this.repository.saveAll(List.of(c));
     }
 }
