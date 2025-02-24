@@ -63,9 +63,9 @@ public class CandidatoController {
     }
 
     @GetMapping("/regions")
-    public List<EnderecoDTO> findRegios() {
+    public List<EnderecoDTO> findRegios(@RequestParam(value = "cargo") CargoEnum cargo) {
         log.info("[CandidatoController] - Buscando regiões");
-        List<EnderecoDTO> regioes = this.service.findAddress();
+        List<EnderecoDTO> regioes = this.service.findAddress(cargo);
         log.info("[CandidatoController] - Regiões encontradas: {}", regioes.size());
         return regioes;
     }
