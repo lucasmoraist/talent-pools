@@ -72,10 +72,11 @@ public class CandidatoController {
     }
 
     @PostMapping("save-all")
-    public void saveAll(@RequestBody List<CandidateRequest> candidatos) {
-        log.info("[CandidatoController] - Recebendo solicitação para salvar candidatos: {}", candidatos);
-        this.service.saveAll(candidatos);
+    public List<Candidato> saveAll(@RequestBody List<CandidateRequest> candidatos) {
+        log.info("[CandidatoController] - Recebendo solicitação para salvar candidatos");
+        var response = this.service.saveAll(candidatos);
         log.info("[CandidatoController] - Candidatos salvos com sucesso");
+        return response;
     }
 
 }

@@ -15,6 +15,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -64,24 +65,6 @@ public class Candidato {
         this.dataCadastro = LocalDate.now();
     }
 
-    public Candidato(CandidateRequest request) {
-        this.nome = request.nome();
-        this.dataNascimento = LocalDate.parse(request.dataNascimento());
-        this.idade = request.idade();
-        this.sexo = SexoEnum.valueOf(request.sexo());
-        this.estadoCivil = EstadoCivilEnum.valueOf(request.estadoCivil());
-        this.contato = new Contato(String.valueOf(request.celular()), String.valueOf(request.telefone()), request.email());
-        this.endereco = new Endereco(request.regiao(), request.rua(), request.bairro(), request.cep());
-        this.documentos = new Documentos(String.valueOf(request.rg()), request.orgaoEmissor(), String.valueOf(request.cpf()), String.valueOf(request.carteiraTrabalho()), request.serie(), String.valueOf(request.tituloEleitor()), request.zonaSecaoUF(), String.valueOf(request.pis()), request.documentosIdentificados().equals("Sim"));
-        this.filhos = new Filhos(request.temFilhos().equals("Sim"), request.quantidade());
-        this.escolaridades = List.of(new Escolaridade(request.grau(), request.formacao(), request.anoConclusao(), request.instituicao(), request.semestre()), new Escolaridade(request.grau(), request.formacao(), request.cursosComplementaresAnoConclusao(), request.instituicao(), request.semestre()));
-        this.experienciaProfissional = List.of(new ExperienciaProfissional(request.empresa1(), request.cargo1(), request.atividades1(), LocalDate.parse(request.admissao1()), LocalDate.parse(request.demissao1()), request.motivo1()), new ExperienciaProfissional(request.empresa2(), request.cargo2(), request.atividades2(), LocalDate.parse(request.admissao2()), LocalDate.parse(request.demissao2()), request.motivo2()), new ExperienciaProfissional(request.empresa3(), request.cargo3(), request.atividades3(), LocalDate.parse(request.admissao3()), LocalDate.parse(request.demissao3()), request.motivo3()));
-        this.resumo = request.resumo();
-        this.cargo = CargoEnum.valueOf(request.cargo());
-        this.status = StatusEnum.PENDENTE;
-        this.dataCadastro = LocalDate.parse(request.dataCadastro());
-    }
-
     public void setStatusPendente() {
         this.status = StatusEnum.PENDENTE;
     }
@@ -92,5 +75,64 @@ public class Candidato {
 
     public void setStatusAprovado() {
         this.status = StatusEnum.APROVADO;
+    }
+
+    public Candidato(CandidateRequest request) {
+        this.nome = request.nome();
+        this.dataNascimento = parseDate(request.dataNascimento());
+        this.idade = request.idade();
+        this.sexo = parseSexo(request.sexo());
+        this.estadoCivil = parseEstadoCivil(request.estadoCivil());
+        this.contato = new Contato(String.valueOf(request.celular()), String.valueOf(request.telefone()), request.email());
+        this.endereco = new Endereco(request.regiao(), request.rua(), request.bairro(), request.cep());
+        this.documentos = new Documentos(String.valueOf(request.rg()), request.orgaoEmissor(), String.valueOf(request.cpf()), String.valueOf(request.carteiraTrabalho()), request.serie(), String.valueOf(request.tituloEleitor()), request.zonaSecaoUF(), String.valueOf(request.pis()), request.documentosIdentificados().equals("Sim"));
+        this.filhos = new Filhos(request.temFilhos().equals("Sim"), request.quantidade());
+        this.escolaridades = List.of(new Escolaridade(request.grau(), request.formacao(), request.anoConclusao(), request.instituicao(), request.semestre()), new Escolaridade(request.grau(), request.formacao(), request.cursosComplementaresAnoConclusao(), request.instituicao(), request.semestre()));
+        this.experienciaProfissional = List.of(
+                new ExperienciaProfissional(
+                        request.empresa1(), request.cargo1(), request.atividades1(),
+                        parseDate(request.admissao1()), parseDate(request.demissao1()), request.motivo1()
+                ),
+                new ExperienciaProfissional(
+                        request.empresa2(), request.cargo2(), request.atividades2(),
+                        parseDate(request.admissao2()), parseDate(request.demissao2()), request.motivo2()
+                ),
+                new ExperienciaProfissional(
+                        request.empresa3(), request.cargo3(), request.atividades3(),
+                        parseDate(request.admissao3()), parseDate(request.demissao3()), request.motivo3()
+                ));
+        this.resumo = request.resumo();
+        this.cargo = parseCargo(request.cargo());
+        this.status = StatusEnum.PENDENTE;
+        this.dataCadastro = parseDate(request.dataCadastro());
+    }
+
+    private LocalDate parseDate(String date) {
+        if (date == null || date.isBlank()) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return LocalDate.parse(date, formatter);
+    }
+
+    private EstadoCivilEnum parseEstadoCivil(String estadoCivil) {
+        if (estadoCivil == null || estadoCivil.isBlank()) {
+            return EstadoCivilEnum.OUTRO;
+        }
+        return EstadoCivilEnum.valueOf(estadoCivil);
+    }
+
+    private SexoEnum parseSexo(String sexo) {
+        if (sexo == null || sexo.isBlank()) {
+            return SexoEnum.OUTRO;
+        }
+        return SexoEnum.valueOf(sexo);
+    }
+
+    private CargoEnum parseCargo(String cargo) {
+        if (cargo == null || cargo.isBlank()) {
+            return CargoEnum.OUTRO;
+        }
+        return CargoEnum.valueOf(cargo);
     }
 }

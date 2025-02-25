@@ -15,5 +15,5 @@ public interface CandidatoService {
     Candidato findById(String id);
     void updateStatus(String id, StatusEnum status);
     List<EnderecoDTO> findAddress(CargoEnum cargo);
-    void saveAll(List<CandidateRequest> request);
+    List<Candidato> saveAll(List<CandidateRequest> request);
 }

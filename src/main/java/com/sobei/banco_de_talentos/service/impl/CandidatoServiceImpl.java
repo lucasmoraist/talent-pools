@@ -88,11 +88,15 @@ public class CandidatoServiceImpl implements CandidatoService {
     }
 
     @Override
-    public void saveAll(List<CandidateRequest> request) {
-        Candidato c = null;
-        for (CandidateRequest candidato : request) {
-            c = new Candidato(candidato);
-        }
-        this.repository.saveAll(List.of(c));
+    public List<Candidato> saveAll(List<CandidateRequest> request) {
+        log.info("[CandidatoServiceImpl] - Salvando todos os candidatos");
+        List<Candidato> candidatos = request.stream()
+                .map(Candidato::new)
+                .collect(Collectors.toList());
+
+        this.repository.saveAll(candidatos);
+        log.info("[CandidatoServiceImpl] - Todos os candidatos salvos com sucesso");
+
+        return candidatos;
     }
 }
