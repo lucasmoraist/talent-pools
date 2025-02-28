@@ -84,7 +84,7 @@ public class Candidato {
         this.sexo = parseSexo(request.sexo());
         this.estadoCivil = parseEstadoCivil(request.estadoCivil());
         this.contato = new Contato(String.valueOf(request.celular()), String.valueOf(request.telefone()), request.email());
-        this.endereco = new Endereco(request.regiao(), request.rua(), request.bairro(), request.cep());
+        this.endereco = new Endereco(request.cep(),request.regiao(), request.rua(), request.bairro());
         this.documentos = new Documentos(String.valueOf(request.rg()), request.orgaoEmissor(), String.valueOf(request.cpf()), String.valueOf(request.carteiraTrabalho()), request.serie(), String.valueOf(request.tituloEleitor()), request.zonaSecaoUF(), String.valueOf(request.pis()), request.documentosIdentificados().equals("Sim"));
         this.filhos = new Filhos(request.temFilhos().equals("Sim"), request.quantidade());
         this.escolaridades = List.of(new Escolaridade(request.grau(), request.formacao(), request.anoConclusao(), request.instituicao(), request.semestre()), new Escolaridade(request.grau(), request.formacao(), request.cursosComplementaresAnoConclusao(), request.instituicao(), request.semestre()));

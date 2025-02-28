@@ -76,15 +76,21 @@ public class CandidatoServiceImpl implements CandidatoService {
         log.info("[CandidatoServiceImpl] - Status do candidato atualizado com sucesso");
     }
 
-    @Cacheable(value = "candidatos")
     @Override
     public List<EnderecoDTO> findAddress(CargoEnum cargo) {
         log.info("[CandidatoServiceImpl] - Buscando endereços dos candidatos");
+
         return this.repository.findAll()
                 .stream()
-                .filter(c -> c.getCargo().equals(cargo))
-                .map(EnderecoDTO::new)
-                .collect(Collectors.toList());
+                .filter(c -> c.getCargo().equals(cargo) && c.getEndereco() != null && !c.getEndereco().getBairro().isEmpty())
+                .collect(Collectors.toMap(
+                        c -> c.getEndereco().getBairro().toUpperCase(), // Normaliza para uppercase para remover duplicatas
+                        c -> new EnderecoDTO(capitalize(c.getEndereco().getBairro())), // Formata para primeira letra maiúscula
+                        (existing, replacement) -> existing // Mantém o primeiro endereço encontrado
+                ))
+                .values()
+                .stream()
+                .toList();
     }
 
     @Override
@@ -98,5 +104,12 @@ public class CandidatoServiceImpl implements CandidatoService {
         log.info("[CandidatoServiceImpl] - Todos os candidatos salvos com sucesso");
 
         return candidatos;
+    }
+
+    private String capitalize(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
     }
 }
