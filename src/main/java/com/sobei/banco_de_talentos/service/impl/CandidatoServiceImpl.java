@@ -82,10 +82,10 @@ public class CandidatoServiceImpl implements CandidatoService {
 
         return this.repository.findAll()
                 .stream()
-                .filter(c -> c.getCargo().equals(cargo) && c.getEndereco() != null && !c.getEndereco().getBairro().isEmpty())
+                .filter(c -> c.getCargo().equals(cargo) && c.getEndereco() != null && !c.getEndereco().getRegiao().isEmpty())
                 .collect(Collectors.toMap(
-                        c -> c.getEndereco().getBairro().toUpperCase(), // Normaliza para uppercase para remover duplicatas
-                        c -> new EnderecoDTO(capitalize(c.getEndereco().getBairro())), // Formata para primeira letra maiúscula
+                        c -> c.getEndereco().getRegiao().toUpperCase(), // Normaliza para uppercase para remover duplicatas
+                        c -> new EnderecoDTO(capitalize(c.getEndereco().getRegiao())), // Formata para primeira letra maiúscula
                         (existing, replacement) -> existing // Mantém o primeiro endereço encontrado
                 ))
                 .values()
