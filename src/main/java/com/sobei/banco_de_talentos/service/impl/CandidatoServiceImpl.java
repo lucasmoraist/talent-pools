@@ -35,19 +35,25 @@ public class CandidatoServiceImpl implements CandidatoService {
         return savedCandidato;
     }
 
+    /**
+     * TODO: Esse finAll irá retornar apenas a paginação dos candidatos, sem filtrar por status, região e esses filtros
+     * serem feitos lá no front-end. Esse metodo deve filtrar apenas pelo cargo
+     */
     @Cacheable(value = "candidatos")
     @Override
-    public Page<Candidato> findAll(int page, int size, StatusEnum statusEnum, String regiao, CargoEnum cargo) {
-        log.info("[CandidatoServiceImpl] - Buscando candidatos com filtros: cargo={}, regiao={}, status={}", cargo, regiao, statusEnum);
-        Pageable pageable = PageRequest.of(page, size);
-        List<Candidato> candidatos = this.repository.findAll()
+    public Page<Candidato> findAll(int page, int size, CargoEnum cargo) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "nome"));
+
+        List<Candidato> candidatosFiltrados = this.repository.findAll()
                 .stream()
-                .filter(c -> (cargo == null || c.getCargo().equals(cargo)))
-                .filter(c -> (regiao == null || c.getEndereco().getRegiao().equalsIgnoreCase(regiao)))
-                .filter(c -> (statusEnum == null || c.getStatus().equals(statusEnum)))
+                .filter(c -> c.getCargo().equals(cargo))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(candidatos, pageable, candidatos.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), candidatosFiltrados.size());
+        List<Candidato> candidatosPaginados = candidatosFiltrados.subList(start, end);
+
+        return new PageImpl<>(candidatosPaginados, pageable, candidatosFiltrados.size());
     }
 
     @Override

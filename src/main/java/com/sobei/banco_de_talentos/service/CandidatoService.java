@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface CandidatoService {
     Candidato save(Candidato candidato, CargoEnum cargo);
-    Page<Candidato> findAll(int page, int size, StatusEnum status, String regiao, CargoEnum cargo);
+    Page<Candidato> findAll(int page, int size, CargoEnum cargo);
     Candidato findById(String id);
     void updateStatus(String id, StatusEnum status);
     List<EnderecoDTO> findAddress(CargoEnum cargo);
