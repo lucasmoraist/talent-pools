@@ -37,7 +37,7 @@ public class PdfServiceImpl implements PdfService {
 
             document.add(new Paragraph(new Text(candidato.getNome()).setFont(boldFont).setFontSize(18)));
             document.add(new Paragraph(new Text("Data de nascimento: ").setFont(boldFont))
-                    .add(new Text(candidato.getDataNascimento().toString()).setFont(regularFont)));
+                    .add(new Text(candidato.getDataNascimento() != null ? candidato.getDataNascimento().toString() : "").setFont(regularFont)));
             document.add(new Paragraph(new Text("Idade: ").setFont(boldFont))
                     .add(new Text(String.valueOf(candidato.getIdade())).setFont(regularFont)));
             document.add(new Paragraph(new Text("Sexo: ").setFont(boldFont))
@@ -114,13 +114,14 @@ public class PdfServiceImpl implements PdfService {
                     document.add(new Paragraph(new Text("Descrição: ").setFont(boldFont))
                             .add(new Text(candidato.getExperienciaProfissional().get(i).getAtividades()).setFont(regularFont)));
                     document.add(new Paragraph(new Text("Admissão: ").setFont(boldFont))
-                            .add(new Text(candidato.getExperienciaProfissional().get(i).getAdmissao().toString()).setFont(regularFont)));
+                            .add(new Text(candidato.getExperienciaProfissional().get(i).getAdmissao() != null ? candidato.getExperienciaProfissional().get(i).getAdmissao().toString() : "").setFont(regularFont)));
                     document.add(new Paragraph(new Text("Demissão: ").setFont(boldFont))
-                            .add(new Text(candidato.getExperienciaProfissional().get(i).getDemissao().toString()).setFont(regularFont)));
+                            .add(new Text(candidato.getExperienciaProfissional().get(i).getDemissao() != null ? candidato.getExperienciaProfissional().get(i).getDemissao().toString() : "").setFont(regularFont)));
                 }
             }
 
             document.add(new Paragraph(new Text("\nResumo:").setFont(boldFont).setFontSize(18)));
+            document.add(new Paragraph(new Text(candidato.getResumo()).setFont(regularFont)));
 
             document.close();
             return out.toByteArray();
