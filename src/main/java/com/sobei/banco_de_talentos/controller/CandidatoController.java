@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,21 +27,24 @@ public class CandidatoController {
     private CandidatoService service;
 
     @PostMapping("/save")
-    public Candidato save(@RequestParam CargoEnum cargo, @RequestBody @Valid Candidato candidato) {
+    public ResponseEntity<Candidato> save(@RequestParam CargoEnum cargo, @RequestBody @Valid Candidato candidato) {
         log.info("[CandidatoController] - Recebendo solicitação para salvar candidato: {}", candidato);
         Candidato savedCandidato = this.service.save(candidato, cargo);
         log.info("[CandidatoController] - Candidato salvo com sucesso: {}", savedCandidato);
-        return savedCandidato;
+        return ResponseEntity.ok(savedCandidato);
     }
 
     @GetMapping
-    public Page<Candidato> findAll(
-            @RequestParam(value = "cargo", required = true) CargoEnum cargo,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size
+    public ResponseEntity<Page<Candidato>> findAll(
+            @RequestParam(value = "cargo") CargoEnum cargo,
+            @RequestParam(value = "status", required = false) StatusEnum status,
+            @RequestParam(value = "regiao", required = false) String regiao,
+            Pageable pageable
             ) {
-        Page<Candidato> candidatos = this.service.findAll(page, size, cargo);
-        return candidatos;
+        log.info("[CandidatoController] - Recebendo solicitação para buscar todos os candidatos");
+        Page<Candidato> candidatos = this.service.findAll(cargo, status, regiao, pageable);
+        log.info("[CandidatoController] - Total de candidatos encontrados: {}", candidatos.getTotalElements());
+        return ResponseEntity.ok(candidatos);
     }
 
     @GetMapping("/{id}")
@@ -58,14 +63,6 @@ public class CandidatoController {
         log.info("[CandidatoController] - Recebendo solicitação para atualizar status do candidato com ID: {}", id);
         this.service.updateStatus(id, status);
         log.info("[CandidatoController] - Status do candidato atualizado");
-    }
-
-    @GetMapping("/regions")
-    public List<EnderecoDTO> findRegios(@RequestParam(value = "cargo") CargoEnum cargo) {
-        log.info("[CandidatoController] - Buscando regiões");
-        List<EnderecoDTO> regioes = this.service.findAddress(cargo);
-        log.info("[CandidatoController] - Regiões encontradas: {}", regioes.size());
-        return regioes;
     }
 
     @PostMapping("save-all")
