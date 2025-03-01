@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,8 +41,8 @@ public class CandidatoController {
             @RequestParam(value = "cargo") CargoEnum cargo,
             @RequestParam(value = "status", required = false) StatusEnum status,
             @RequestParam(value = "regiao", required = false) String regiao,
-            Pageable pageable
-            ) {
+            @PageableDefault(value = 10, size = 10, page = 0, direction = Sort.Direction.DESC, sort = {"dataCadastro"}) Pageable pageable
+    ) {
         log.info("[CandidatoController] - Recebendo solicitação para buscar todos os candidatos");
         Page<Candidato> candidatos = this.service.findAll(cargo, status, regiao, pageable);
         log.info("[CandidatoController] - Total de candidatos encontrados: {}", candidatos.getTotalElements());
