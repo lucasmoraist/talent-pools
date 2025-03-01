@@ -8,11 +8,15 @@ import com.sobei.banco_de_talentos.domain.exceptions.ResourceNotFound;
 import com.sobei.banco_de_talentos.domain.model.Candidato;
 import com.sobei.banco_de_talentos.repository.CandidatoRepository;
 import com.sobei.banco_de_talentos.service.CandidatoService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +24,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CandidatoServiceImpl implements CandidatoService {
 
-    @Autowired
-    private CandidatoRepository repository;
+    private final CandidatoRepository repository;
+    private final MongoTemplate mongoTemplate;
 
     @CacheEvict(value = "candidatos", allEntries = true)
     @Override
@@ -35,25 +40,18 @@ public class CandidatoServiceImpl implements CandidatoService {
         return savedCandidato;
     }
 
-    /**
-     * TODO: Esse finAll irá retornar apenas a paginação dos candidatos, sem filtrar por status, região e esses filtros
-     * serem feitos lá no front-end. Esse metodo deve filtrar apenas pelo cargo
-     */
     @Cacheable(value = "candidatos")
     @Override
-    public Page<Candidato> findAll(int page, int size, CargoEnum cargo) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "nome"));
+    public Page<Candidato> findAll(CargoEnum cargo, StatusEnum status, String regiao, Pageable pageable) {
+        log.info("[CandidatoServiceImpl] - Buscando todos os candidatos");
+        Query query = this.filters(cargo, status, regiao);
 
-        List<Candidato> candidatosFiltrados = this.repository.findAll()
-                .stream()
-                .filter(c -> c.getCargo().equals(cargo))
-                .collect(Collectors.toList());
+        long total = mongoTemplate.count(query, Candidato.class);
+        log.info("[CandidatoServiceImpl] - Total de candidatos encontrados: {}", total);
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), candidatosFiltrados.size());
-        List<Candidato> candidatosPaginados = candidatosFiltrados.subList(start, end);
+        List<Candidato> candidatos = mongoTemplate.find(query.with(pageable), Candidato.class);
 
-        return new PageImpl<>(candidatosPaginados, pageable, candidatosFiltrados.size());
+        return new PageImpl<>(candidatos, pageable, total);
     }
 
     @Override
@@ -73,30 +71,13 @@ public class CandidatoServiceImpl implements CandidatoService {
         Candidato candidato = this.findById(id);
 
         switch (status) {
-            case PENDENTE -> candidato.setStatusPendente();
+            case DISPONIVEL -> candidato.setStatusPendente();
             case APROVADO -> candidato.setStatusAprovado();
             case EM_ANALISE -> candidato.setStatusEmAnalise();
         }
 
         this.repository.save(candidato);
         log.info("[CandidatoServiceImpl] - Status do candidato atualizado com sucesso");
-    }
-
-    @Override
-    public List<EnderecoDTO> findAddress(CargoEnum cargo) {
-        log.info("[CandidatoServiceImpl] - Buscando endereços dos candidatos");
-
-        return this.repository.findAll()
-                .stream()
-                .filter(c -> c.getCargo().equals(cargo) && c.getEndereco() != null && !c.getEndereco().getRegiao().isEmpty())
-                .collect(Collectors.toMap(
-                        c -> c.getEndereco().getRegiao().toUpperCase(), // Normaliza para uppercase para remover duplicatas
-                        c -> new EnderecoDTO(capitalize(c.getEndereco().getRegiao())), // Formata para primeira letra maiúscula
-                        (existing, replacement) -> existing // Mantém o primeiro endereço encontrado
-                ))
-                .values()
-                .stream()
-                .toList();
     }
 
     @Override
@@ -117,5 +98,20 @@ public class CandidatoServiceImpl implements CandidatoService {
             return text;
         }
         return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
+    }
+
+    private Query filters(CargoEnum cargo, StatusEnum status, String regiao) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("cargo").is(cargo));
+        log.info("[CandidatoServiceImpl] - Adicionando filtro de cargo: {}", cargo);
+        if (status != null) {
+            query.addCriteria(Criteria.where("status").is(status));
+            log.info("[CandidatoServiceImpl] - Adicionando filtro de status: {}", status);
+        }
+        if (regiao != null && !regiao.isBlank()) {
+            query.addCriteria(Criteria.where("endereco.regiao").regex(regiao, "i"));
+            log.info("[CandidatoServiceImpl] - Adicionando filtro de região: {}", regiao);
+        }
+        return query;
     }
 }
