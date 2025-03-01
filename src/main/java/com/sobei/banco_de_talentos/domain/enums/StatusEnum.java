@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum StatusEnum {
-    PENDENTE("Pendente"),
+    DISPONIVEL("Disponível"),
     EM_ANALISE("Em análise"),
     APROVADO("Aprovado");
 
