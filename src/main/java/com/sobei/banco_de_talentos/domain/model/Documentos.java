@@ -1,5 +1,6 @@
 package com.sobei.banco_de_talentos.domain.model;
 
+import com.sobei.banco_de_talentos.domain.dto.CandidateRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,4 +27,16 @@ public class Documentos {
     @NotBlank(message = "Informe o pis")
     private String pis;
     private boolean documentosIdentificados;
+
+    public Documentos(CandidateRequest request) {
+        this.rg = String.valueOf(request.rg());
+        this.orgaoEmissor = request.orgaoEmissor();
+        this.cpf = String.valueOf(request.cpf());
+        this.carteiraTrabalho = String.valueOf(request.carteiraTrabalho());
+        this.serie = request.serie();
+        this.tituloEleitor = String.valueOf(request.tituloEleitor());
+        this.zonaSecaoUF = request.zonaSecaoUF();
+        this.pis = String.valueOf(request.pis());
+        this.documentosIdentificados = request.documentosIdentificados().equals("Sim");
+    }
 }

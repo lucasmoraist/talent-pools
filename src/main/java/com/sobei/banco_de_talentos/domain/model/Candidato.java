@@ -61,20 +61,8 @@ public class Candidato {
         this.experienciaProfissional = request.getExperienciaProfissional();
         this.resumo = request.getResumo();
         this.cargo = cargo;
-        this.status = StatusEnum.PENDENTE;
+        this.status = StatusEnum.DISPONIVEL;
         this.dataCadastro = LocalDate.now();
-    }
-
-    public void setStatusPendente() {
-        this.status = StatusEnum.PENDENTE;
-    }
-
-    public void setStatusEmAnalise() {
-        this.status = StatusEnum.EM_ANALISE;
-    }
-
-    public void setStatusAprovado() {
-        this.status = StatusEnum.APROVADO;
     }
 
     public Candidato(CandidateRequest request) {
@@ -83,11 +71,11 @@ public class Candidato {
         this.idade = request.idade();
         this.sexo = parseSexo(request.sexo());
         this.estadoCivil = parseEstadoCivil(request.estadoCivil());
-        this.contato = new Contato(String.valueOf(request.celular()), String.valueOf(request.telefone()), request.email());
-        this.endereco = new Endereco(request.cep(),request.regiao(), request.rua(), request.bairro());
-        this.documentos = new Documentos(String.valueOf(request.rg()), request.orgaoEmissor(), String.valueOf(request.cpf()), String.valueOf(request.carteiraTrabalho()), request.serie(), String.valueOf(request.tituloEleitor()), request.zonaSecaoUF(), String.valueOf(request.pis()), request.documentosIdentificados().equals("Sim"));
-        this.filhos = new Filhos(request.temFilhos().equals("Sim"), request.quantidade());
-        this.escolaridades = List.of(new Escolaridade(request.grau(), request.formacao(), request.anoConclusao(), request.instituicao(), request.semestre()), new Escolaridade(request.grau(), request.formacao(), request.cursosComplementaresAnoConclusao(), request.instituicao(), request.semestre()));
+        this.contato = new Contato(request);
+        this.endereco = new Endereco(request);
+        this.documentos = new Documentos(request);
+        this.filhos = new Filhos(request);
+        this.escolaridades = List.of(new Escolaridade(request));
         this.experienciaProfissional = List.of(
                 new ExperienciaProfissional(
                         request.empresa1(), request.cargo1(), request.atividades1(),
@@ -103,8 +91,20 @@ public class Candidato {
                 ));
         this.resumo = request.resumo();
         this.cargo = parseCargo(request.cargo());
-        this.status = StatusEnum.PENDENTE;
+        this.status = StatusEnum.DISPONIVEL;
         this.dataCadastro = parseDate(request.dataCadastro());
+    }
+
+    public void setStatusPendente() {
+        this.status = StatusEnum.DISPONIVEL;
+    }
+
+    public void setStatusEmAnalise() {
+        this.status = StatusEnum.EM_ANALISE;
+    }
+
+    public void setStatusAprovado() {
+        this.status = StatusEnum.APROVADO;
     }
 
     private LocalDate parseDate(String date) {
