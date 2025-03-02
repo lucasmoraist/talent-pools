@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Service
@@ -51,15 +53,13 @@ public class PdfServiceImpl implements PdfService {
 
             document.add(image);
 
-            // Adicionar nome
             if (candidato.getNome() != null && !candidato.getNome().isEmpty()) {
                 document.add(new Paragraph(new Text(candidato.getNome()).setFont(boldFont).setFontSize(18)));
             }
 
-            // Adicionar data de nascimento
             if (candidato.getDataNascimento() != null) {
                 document.add(new Paragraph(new Text("Data de nascimento: ").setFont(boldFont))
-                        .add(new Text(candidato.getDataNascimento().toString()).setFont(regularFont)));
+                        .add(new Text(parseDate(candidato.getDataNascimento())).setFont(regularFont)));
             }
 
             // Adicionar idade
@@ -214,6 +214,15 @@ public class PdfServiceImpl implements PdfService {
             log.error("Erro ao gerar PDF", e);
             return null;
         }
+    }
+
+    private String parseDate(LocalDate dataNascimento) {
+        if (dataNascimento == null) {
+            return null;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return dataNascimento.format(formatter);
     }
 
 }
