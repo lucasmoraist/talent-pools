@@ -24,19 +24,26 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario save(Usuario request) {
-        log.info("[UsuarioServiceImpl] - Tentando salvar usuário com email: {}", request.getEmail());
-        if (this.repository.findByEmail(request.getEmail()).isPresent()) {
-            log.error("[UsuarioServiceImpl] - Usuário já cadastrado: {}", request.getEmail());
+        validarUsuarioExistente(request.getEmail());
+        Usuario usuario = criarUsuario(request);
+        Usuario savedUsuario = this.repository.save(usuario);
+        log.info("[UsuarioServiceImpl] - Usuário salvo com sucesso: {}", savedUsuario.getEmail());
+        return savedUsuario;
+    }
+
+    private void validarUsuarioExistente(String email) {
+        if (this.repository.findByEmail(email).isPresent()) {
+            log.error("[UsuarioServiceImpl] - Usuário já cadastrado: {}", email);
             throw new UniqueException("E-mail já cadastrado");
         }
-        Usuario usuario = Usuario.builder()
+    }
+
+    private Usuario criarUsuario(Usuario request) {
+        return Usuario.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(this.passwordEncoder.encode(request.getPassword()))
                 .build();
-        Usuario savedUsuario = this.repository.save(usuario);
-        log.info("[UsuarioServiceImpl] - Usuário salvo com sucesso: {}", savedUsuario.getEmail());
-        return savedUsuario;
     }
 
     @Override
@@ -52,17 +59,24 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public String login(LoginRequest request) {
         log.info("[UsuarioServiceImpl] - Tentativa de login para o email: {}", request.email());
-        Usuario usuario = this.findByEmail(request.email());
+        Usuario usuario = validarCredenciais(request);
+        return gerarToken(usuario);
+    }
+
+    private Usuario validarCredenciais(LoginRequest request) {
+        Usuario usuario = findByEmail(request.email());
         log.info("[UsuarioServiceImpl] - Usuário encontrado: {}", usuario.getEmail());
 
         if (!this.passwordEncoder.matches(request.password(), usuario.getPassword())) {
             log.error("[UsuarioServiceImpl] - Senha inválida para o email: {}", request.email());
             throw new CredentialsInvalid("E-mail ou senha inválida");
         }
+        return usuario;
+    }
 
+    private String gerarToken(Usuario usuario) {
         String token = this.tokenService.generateToken(usuario.getEmail());
         log.info("[UsuarioServiceImpl] - Usuário logado com sucesso: {}", usuario.getEmail());
-
         return token;
     }
 }
