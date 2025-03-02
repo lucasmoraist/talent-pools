@@ -42,9 +42,9 @@ public class CandidatoServiceImpl implements CandidatoService {
 
     @Cacheable(value = "candidatos", key = "{#cargo, #status, #regiao, #pageable.pageNumber, #pageable.pageSize}")
     @Override
-    public Page<Candidato> findAll(CargoEnum cargo, StatusEnum status, String regiao, Pageable pageable) {
+    public Page<Candidato> findAll(CargoEnum cargo, StatusEnum status, String regiao, String nome, Pageable pageable) {
         log.info("[CandidatoServiceImpl] - Buscando todos os candidatos");
-        Query query = this.buildFilters(cargo, status, regiao);
+        Query query = this.buildFilters(cargo, status, regiao, nome);
 
         long total = mongoTemplate.count(query, Candidato.class);
         log.info("[CandidatoServiceImpl] - Total de candidatos encontrados: {}", total);
@@ -83,7 +83,7 @@ public class CandidatoServiceImpl implements CandidatoService {
         return candidatos;
     }
 
-    private Query buildFilters(CargoEnum cargo, StatusEnum status, String regiao) {
+    private Query buildFilters(CargoEnum cargo, StatusEnum status, String regiao, String nome) {
         Query query = new Query().addCriteria(Criteria.where("cargo").is(cargo));
         log.info("[CandidatoServiceImpl] - Adicionando filtro de cargo: {}", cargo);
         if (status != null) {
@@ -93,6 +93,10 @@ public class CandidatoServiceImpl implements CandidatoService {
         if (regiao != null && !regiao.isBlank()) {
             query.addCriteria(Criteria.where("endereco.regiao").regex(regiao, "i"));
             log.info("[CandidatoServiceImpl] - Adicionando filtro de região: {}", regiao);
+        }
+        if (nome != null && !nome.isBlank()) {
+            query.addCriteria(Criteria.where("nome").regex(nome, "i"));
+            log.info("[CandidatoServiceImpl] - Adicionando filtro de nome: {}", nome);
         }
         return query;
     }

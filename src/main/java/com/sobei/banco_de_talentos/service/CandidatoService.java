@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CandidatoService {
     Candidato save(Candidato candidato, CargoEnum cargo);
-    Page<Candidato> findAll(CargoEnum cargo, StatusEnum status, String regiao, Pageable pageable);
+    Page<Candidato> findAll(CargoEnum cargo, StatusEnum status, String regiao, String nome, Pageable pageable);
     Candidato findById(String id);
     void updateStatus(String id, StatusEnum status);
     List<Candidato> saveAll(List<CandidateRequest> request);
