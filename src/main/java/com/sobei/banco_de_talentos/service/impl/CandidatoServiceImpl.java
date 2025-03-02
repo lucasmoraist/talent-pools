@@ -35,16 +35,16 @@ public class CandidatoServiceImpl implements CandidatoService {
     public Candidato save(Candidato request, CargoEnum cargo) {
         log.info("[CandidatoServiceImpl] - Salvando candidato: {}", request);
         Candidato savedCandidato = new Candidato(request, cargo);
-        this.repository.save(savedCandidato);
+        repository.save(savedCandidato);
         log.info("[CandidatoServiceImpl] - Candidato salvo com sucesso: {}", savedCandidato);
         return savedCandidato;
     }
 
-    @Cacheable(value = "candidatos")
+    @Cacheable(value = "candidatos", key = "{#cargo, #status, #regiao, #pageable.pageNumber, #pageable.pageSize}")
     @Override
     public Page<Candidato> findAll(CargoEnum cargo, StatusEnum status, String regiao, Pageable pageable) {
         log.info("[CandidatoServiceImpl] - Buscando todos os candidatos");
-        Query query = this.filters(cargo, status, regiao);
+        Query query = this.buildFilters(cargo, status, regiao);
 
         long total = mongoTemplate.count(query, Candidato.class);
         log.info("[CandidatoServiceImpl] - Total de candidatos encontrados: {}", total);
@@ -57,7 +57,7 @@ public class CandidatoServiceImpl implements CandidatoService {
     @Override
     public Candidato findById(String id) {
         log.info("[CandidatoServiceImpl] - Buscando candidato por ID: {}", id);
-        return this.repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> {
                     log.error("[CandidatoServiceImpl] - Candidato não encontrado para o ID: {}", id);
                     return new ResourceNotFound("Candidato não encontrado");
@@ -68,41 +68,23 @@ public class CandidatoServiceImpl implements CandidatoService {
     @Override
     public void updateStatus(String id, StatusEnum status) {
         log.info("[CandidatoServiceImpl] - Atualizando status do candidato com ID: {}", id);
-        Candidato candidato = this.findById(id);
-
-        switch (status) {
-            case DISPONIVEL -> candidato.setStatusPendente();
-            case APROVADO -> candidato.setStatusAprovado();
-            case EM_ANALISE -> candidato.setStatusEmAnalise();
-        }
-
-        this.repository.save(candidato);
+        Candidato candidato = findById(id);
+        this.updateCandidateStatus(candidato, status);
+        repository.save(candidato);
         log.info("[CandidatoServiceImpl] - Status do candidato atualizado com sucesso");
     }
 
     @Override
-    public List<Candidato> saveAll(List<CandidateRequest> request) {
+    public List<Candidato> saveAll(List<CandidateRequest> requests) {
         log.info("[CandidatoServiceImpl] - Salvando todos os candidatos");
-        List<Candidato> candidatos = request.stream()
-                .map(Candidato::new)
-                .collect(Collectors.toList());
-
-        this.repository.saveAll(candidatos);
+        List<Candidato> candidatos = this.mapRequestsToCandidates(requests);
+        repository.saveAll(candidatos);
         log.info("[CandidatoServiceImpl] - Todos os candidatos salvos com sucesso");
-
         return candidatos;
     }
 
-    private String capitalize(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
-        }
-        return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
-    }
-
-    private Query filters(CargoEnum cargo, StatusEnum status, String regiao) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("cargo").is(cargo));
+    private Query buildFilters(CargoEnum cargo, StatusEnum status, String regiao) {
+        Query query = new Query().addCriteria(Criteria.where("cargo").is(cargo));
         log.info("[CandidatoServiceImpl] - Adicionando filtro de cargo: {}", cargo);
         if (status != null) {
             query.addCriteria(Criteria.where("status").is(status));
@@ -113,5 +95,17 @@ public class CandidatoServiceImpl implements CandidatoService {
             log.info("[CandidatoServiceImpl] - Adicionando filtro de região: {}", regiao);
         }
         return query;
+    }
+
+    private void updateCandidateStatus(Candidato candidato, StatusEnum status) {
+        switch (status) {
+            case DISPONIVEL -> candidato.setStatusPendente();
+            case APROVADO -> candidato.setStatusAprovado();
+            case EM_ANALISE -> candidato.setStatusEmAnalise();
+        }
+    }
+
+    private List<Candidato> mapRequestsToCandidates(List<CandidateRequest> requests) {
+        return requests.stream().map(Candidato::new).collect(Collectors.toList());
     }
 }
