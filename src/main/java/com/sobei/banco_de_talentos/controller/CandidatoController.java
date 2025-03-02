@@ -47,10 +47,11 @@ public class CandidatoController {
             @RequestParam(value = "cargo") CargoEnum cargo,
             @RequestParam(value = "status", required = false) StatusEnum status,
             @RequestParam(value = "regiao", required = false) String regiao,
+            @RequestParam(value = "nome", required = false) String nome,
             @PageableDefault(value = 10, size = 10, page = 0, direction = Sort.Direction.DESC, sort = {"dataCadastro"}) Pageable pageable
     ) {
         log.info("[CandidatoController] - Recebendo solicitação para buscar todos os candidatos");
-        Page<Candidato> candidatos = this.service.findAll(cargo, status, regiao, pageable);
+        Page<Candidato> candidatos = this.service.findAll(cargo, status, regiao, nome, pageable);
         log.info("[CandidatoController] - Total de candidatos encontrados: {}", candidatos.getTotalElements());
         return ResponseEntity.ok(candidatos);
     }
