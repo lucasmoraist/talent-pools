@@ -6,6 +6,8 @@ import com.sobei.banco_de_talentos.domain.enums.CargoEnum;
 import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
 import com.sobei.banco_de_talentos.domain.model.Candidato;
 import com.sobei.banco_de_talentos.service.CandidatoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ public class CandidatoController {
     @Autowired
     private CandidatoService service;
 
+    @Operation(summary = "Salvar candidato", description = "Salva um candidato no banco de dados")
     @PostMapping("/save")
     public ResponseEntity<Candidato> save(@RequestParam CargoEnum cargo, @RequestBody @Valid Candidato candidato) {
         log.info("[CandidatoController] - Recebendo solicitação para salvar candidato: {}", candidato);
@@ -36,6 +39,9 @@ public class CandidatoController {
         return ResponseEntity.ok(savedCandidato);
     }
 
+    @Operation(summary = "Listar candidatos", description = "Lista todos os candidatos cadastrados no banco de dados", security = {
+            @SecurityRequirement(name = "bearer")
+    })
     @GetMapping
     public ResponseEntity<Page<Candidato>> findAll(
             @RequestParam(value = "cargo") CargoEnum cargo,
@@ -49,6 +55,9 @@ public class CandidatoController {
         return ResponseEntity.ok(candidatos);
     }
 
+    @Operation(summary = "Buscar candidato por ID", description = "Busca um candidato no banco de dados pelo ID", security = {
+            @SecurityRequirement(name = "bearer")
+    })
     @GetMapping("/{id}")
     public Candidato findById(@PathVariable String id) {
         log.info("[CandidatoController] - Recebendo solicitação para buscar candidato com ID: {}", id);
@@ -57,6 +66,9 @@ public class CandidatoController {
         return candidato;
     }
 
+    @Operation(summary = "Atualizar candidato", description = "Atualiza um candidato no banco de dados", security = {
+            @SecurityRequirement(name = "bearer")
+    })
     @PatchMapping("/{id}")
     public void updateStatus(
             @PathVariable String id,
@@ -67,6 +79,9 @@ public class CandidatoController {
         log.info("[CandidatoController] - Status do candidato atualizado");
     }
 
+    @Operation(summary = "Salva candidatos", description = "Método apenas para salvar todos usuários antigos", security = {
+            @SecurityRequirement(name = "bearer")
+    })
     @PostMapping("save-all")
     public List<Candidato> saveAll(@RequestBody List<CandidateRequest> candidatos) {
         log.info("[CandidatoController] - Recebendo solicitação para salvar candidatos");
