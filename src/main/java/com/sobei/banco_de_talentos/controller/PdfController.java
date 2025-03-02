@@ -1,6 +1,8 @@
 package com.sobei.banco_de_talentos.controller;
 
 import com.sobei.banco_de_talentos.service.PdfService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,6 +19,9 @@ public class PdfController {
     @Autowired
     private PdfService pdfService;
 
+    @Operation(summary = "Gerar currículo em PDF", description = "Gera um PDF com base no ID do candidato", security = {
+            @SecurityRequirement(name = "bearer")
+    })
     @GetMapping("{id}")
     public ResponseEntity<byte[]> generate(@PathVariable String id) {
         byte[] pdf = this.pdfService.generate(id);
