@@ -1,6 +1,16 @@
 version: '3.1'
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    networks:
+      - db_network
 
   mongo:
     image: mongo
@@ -10,6 +20,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - "27017:27017"
+    networks:
+      - db_network
 
   mongo-express:
     image: mongo-express
@@ -21,3 +33,9 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+    networks:
+      - db_network
+
+networks:
+  db_network:
+    driver: bridge
