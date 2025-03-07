@@ -1,5 +1,7 @@
 package com.sobei.banco_de_talentos.controller;
 
+import com.sobei.banco_de_talentos.domain.model.Candidato;
+import com.sobei.banco_de_talentos.service.CandidatoService;
 import com.sobei.banco_de_talentos.service.PdfService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,6 +20,8 @@ public class PdfController {
 
     @Autowired
     private PdfService pdfService;
+    @Autowired
+    private CandidatoService candidatoService;
 
     @Operation(summary = "Gerar currículo em PDF", description = "Gera um PDF com base no ID do candidato", security = {
             @SecurityRequirement(name = "bearer")
@@ -25,9 +29,9 @@ public class PdfController {
     @GetMapping("{id}")
     public ResponseEntity<byte[]> generate(@PathVariable String id) {
         byte[] pdf = this.pdfService.generate(id);
-
+        Candidato candidato = this.candidatoService.findById(id);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=curriculo.pdf")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Curriculo "+candidato.getNome()+".pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }

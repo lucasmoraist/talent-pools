@@ -12,6 +12,7 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.sobei.banco_de_talentos.domain.enums.StatusEnum;
 import com.sobei.banco_de_talentos.domain.model.Candidato;
 import com.sobei.banco_de_talentos.domain.model.Escolaridade;
 import com.sobei.banco_de_talentos.domain.model.ExperienciaProfissional;
@@ -35,6 +36,7 @@ public class PdfServiceImpl implements PdfService {
     @Override
     public byte[] generate(String id) {
         Candidato candidato = this.candidatoService.findById(id);
+        this.candidatoService.updateStatus(id, StatusEnum.EM_ANALISE);
         String imagePath = "src/main/resources/assets/logo-sobei.png";
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -54,7 +56,7 @@ public class PdfServiceImpl implements PdfService {
             document.add(image);
 
             if (candidato.getNome() != null && !candidato.getNome().isEmpty()) {
-                document.add(new Paragraph(new Text(candidato.getNome()).setFont(boldFont).setFontSize(18)));
+                document.add(new Paragraph(new Text("\n"+candidato.getNome()).setFont(boldFont).setFontSize(18)));
             }
 
             if (candidato.getDataNascimento() != null) {
