@@ -14,7 +14,7 @@ public class CorsConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://lightskyblue-hippopotamus-777830.hostingersite.com/")
+                        .allowedOrigins("https://talentpool-production-91e8.up.railway.app/")
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*");
             }};
