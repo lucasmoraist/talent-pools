@@ -18,7 +18,7 @@ public class SwaggerImpl {
     public OpenAPI documentation() {
         return new OpenAPI()
                 .info(this.info())
-                .servers(List.of(this.serverLocal()))
+                .servers(List.of(this.serverLocal(), this.serverProduction()))
                 .components(components());
     }
 
@@ -47,11 +47,11 @@ public class SwaggerImpl {
                 .description("Servidor local");
     }
 
-//    private Server serverProduction() {
-//        return new Server()
-//                .url("")
-//                .description("Servidor de produção");
-//    }
+    private Server serverProduction() {
+        return new Server()
+                .url("https://talentpool-production-91e8.up.railway.app")
+                .description("Servidor de produção");
+    }
 
     private Components components(){
         return new Components()
