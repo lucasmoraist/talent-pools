@@ -7,15 +7,13 @@ RUN mvn dependency:go-offline
 
 COPY src ./src
 
-RUN mvn clean package -DskipTests
+RUN mvn clean package
 
 FROM eclipse-temurin:19-alpine
 
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
-
-COPY --from=build /app/target/classes /app/resources
 
 EXPOSE 8080
 
