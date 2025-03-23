@@ -37,23 +37,23 @@ public class PdfServiceImpl implements PdfService {
     public byte[] generate(String id) {
         Candidato candidato = this.candidatoService.findById(id);
         this.candidatoService.updateStatus(id, StatusEnum.EM_ANALISE);
-        String imagePath = getClass().getClassLoader().getResource("assets/logo-sobei.png").getPath();
+//        String imagePath = getClass().getClassLoader().getResource("assets/logo-sobei.png").getPath();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
 
-            ImageData imageData = ImageDataFactory.create(imagePath);
-            Image image = new Image(imageData);
-            image.setWidth(200);
-            image.setHeight(60);
-            image.setHorizontalAlignment(HorizontalAlignment.CENTER);
+//            ImageData imageData = ImageDataFactory.create(imagePath);
+//            Image image = new Image(imageData);
+//            image.setWidth(200);
+//            image.setHeight(60);
+//            image.setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
-            document.add(image);
+//            document.add(image);
 
             if (candidato.getNome() != null && !candidato.getNome().isEmpty()) {
                 document.add(new Paragraph(new Text("\n"+candidato.getNome()).setFont(boldFont).setFontSize(18)));
