@@ -37,7 +37,7 @@ public class PdfServiceImpl implements PdfService {
     public byte[] generate(String id) {
         Candidato candidato = this.candidatoService.findById(id);
         this.candidatoService.updateStatus(id, StatusEnum.EM_ANALISE);
-        String imagePath = "src/main/resources/assets/logo-sobei.png";
+        String imagePath = getClass().getClassLoader().getResource("assets/logo-sobei.png").getPath();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(out);
